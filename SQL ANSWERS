@@ -2,7 +2,24 @@
 
 # Q.1 Find the day with the highest total revenue and the corresponding revenue amount?
 
-**SELECT**  
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Project</title>
+    <style>
+        .red-text {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Project</h1>
+    <p>Welcome to my project!</p>
+    <p class="red-text">SELECT</p>
+    <p>More project details go here.</p>
+</body>
+</html>
+ 
     DATE_FORMAT(STR_TO_DATE(order_date, '%Y-%m-%d'), '%W') **AS** week_day,  
     SUM(total_price) **AS** total_revenue  
 **FROM**   
