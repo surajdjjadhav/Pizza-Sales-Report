@@ -2,7 +2,7 @@
 
 **Q.1 Find the day with the highest total revenue and the corresponding revenue amount?**
 
-SELECT 
+SELECT   
     DATE_FORMAT(STR_TO_DATE(order_date, '%Y-%m-%d'),   '%W') AS week_day,  
     SUM(total_price) AS total_revenue  
 FROM   
