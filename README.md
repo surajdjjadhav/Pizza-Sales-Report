@@ -3,11 +3,10 @@
 **Q.1 Find the day with the highest total revenue and the corresponding revenue amount?**
 
 SELECT 
-    DATE_FORMAT(STR_TO_DATE(order_date, '%Y-%m-%d'),  
-            '%W') AS week_day,  
+    DATE_FORMAT(STR_TO_DATE(order_date, '%Y-%m-%d'),   '%W') AS week_day,  
     SUM(total_price) AS total_revenue  
 FROM   
-    PIZZA_SALES  
+      PIZZA_SALES  
 GROUP BY week_day  
 ORDER BY total_revenue DESC  
 LIMIT 1;  
@@ -17,34 +16,34 @@ LIMIT 1;
 
 **Q.2 Calculate the cumulative revenue for each month.**
 
-with 
-total_sales_revenue as
-( select 
-	 date_format(str_to_date(order_date , '%Y-%m-%d'), '%m') as month_number ,
-     date_format(str_to_date(order_date , '%Y-%m-%d') ,'%M') as month_1,
-     sum(total_price) as total_revenue
-     FROM PIZZA_SALES
-     GROUP BY month_number , month_1 ),
-sales_rank as
-		( SELECT 
-				month_number,
-				month_1,
-                total_revenue,
-                round((total_revenue - LAG(total_revenue) over ( order by month_number))/LAG(total_revenue) over (order by month_number) *100,2) as cumulative_revenue
-				from 
-                total_sales_revenue
+with   
+total_sales_revenue as  
+( select   
+	 date_format(str_to_date(order_date , '%Y-%m-%d'), '%m') as month_number ,  
+     date_format(str_to_date(order_date , '%Y-%m-%d') ,'%M') as month_1,  
+     sum(total_price) as total_revenue  
+     FROM PIZZA_SALES  
+     GROUP BY month_number , month_1 ),  
+sales_rank as  
+		( SELECT   
+				month_number,  
+				month_1,  
+                total_revenue,  
+                round((total_revenue - LAG(total_revenue) over ( order by month_number))/LAG(total_revenue) over (order by month_number) *100,2) as cumulative_revenue  
+			  	from   
+                total_sales_revenue  
                 )
-	select   
-			month_number,
-			month_1 ,
-			total_revenue ,
-            cumulative_revenue
-	from 
-		sales_rank
-	group by 
-			month_number , month_1
-	order by 
-			month_number  asc ;
+  	select   
+		  	month_number,      
+		    	month_1 ,   
+			total_revenue ,  
+            cumulative_revenue  
+  	from   
+  		sales_rank  
+  	group by     
+			month_number , month_1  
+	order by   
+			month_number  asc ;  
 
 
 
