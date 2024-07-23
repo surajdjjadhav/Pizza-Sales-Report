@@ -1,9 +1,9 @@
-/* Questions & Answers */
+#  Questions & Answers 
 
 # Q.1 Find the day with the highest total revenue and the corresponding revenue amount?
 
 **SELECT**  
-    DATE_FORMAT(STR_TO_DATE(order_date, '%Y-%m-%d'),   '%W') **AS** week_day,  
+    DATE_FORMAT(STR_TO_DATE(order_date, '%Y-%m-%d'), '%W') **AS** week_day,  
     SUM(total_price) **AS** total_revenue  
 **FROM**   
       PIZZA_SALES  
@@ -14,43 +14,8 @@
 
 
 
-# Q.2 Calculate the cumulative revenue for each month?
 
-**with**   
-total_sales_revenue **AS**  
-( **select**   
-	 date_format(str_to_date(order_date , '%Y-%m-%d'), '%m') **AS** month_number ,  
-     date_format(str_to_date(order_date , '%Y-%m-%d') ,'%M') **AS** month_1,  
-     sum(total_price) **AS** total_revenue  
-    ** FROM** PIZZA_SALES  
-     **GROUP BY** month_number , month_1 ),  
-sales_rank **AS**  
-		( **SELECT**     
-				month_number,    
-				month_1,    
-                total_revenue,    
-                round((total_revenue - **LAG**(total_revenue) **over** ( **order by** month_number))/**LAG**(total_revenue) **over** (**order by** month_number) *100,2) **AS**  
- cumulative_revenue        
-			  	**FROM**     
-                total_sales_revenue      
-                )  
-  	**SELECT**    
-		  	month_number,          
-		    	month_1 ,     
-			total_revenue ,    
-            cumulative_revenue    
-  	**from**   
-  		sales_rank    
-  	**group by**       
-			  month_number , month_1   
-	**order by**       
-			month_number  **ASC** ;    
-
-
-
-
-
-# Q3. Identify the top 3 most expensive pizzas (by unit price) and their total sales (quantity)?
+# Q.2 Identify the top 3 most expensive pizzas (by unit price) and their total sales (quantity)?
   
    **SELECT**   
     pizza_name_id, unit_price, SUM(quantity) **AS** total_sales  
@@ -62,7 +27,8 @@ sales_rank **AS**
 
 
 
-# Q4. Get the average order value (total_price) for each pizza category.
+
+# Q.3 Get the average order value (total_price) for each pizza category ?
 
 **SELECT**   
     pizza_category,  
@@ -79,20 +45,95 @@ sales_rank **AS**
 
 
 
-# Q.5 Determine the most popular pizza size for each day of the week.
+# Q.4 Calculate the percentage contribution of each pizza category to the total revenue ?
 
-**WITH** PIZZA_SALES_REVENUE AS (  
+
+**SELECT**  
+	  pizza_category,    
+      (total_value / total_revenue ) *100 **AS** percentile_revenue    
+      **FROM**  
+		( select  
+          pizza_category,  
+          sum(total_price) **AS** total_value ,  
+          (**SELECT** sum(total_price) **FROM** pizza_sales ) **AS** total_revenue  
+**FROM** PIZZA_SALES  
+**GROUP BY** pizza_category) **AS** total_category  
+**ORDER BY**   
+percentile_revenue  **DESC** ;
+
+
+# Q.5 Find the average quantity of pizzas ordered per order for each pizza size ?
+
+**SELECT**   
+    pizza_size,  
+    (SUM(quantity) / COUNT(pizza_id)) **AS** AVERAGE  
+**FROM**   
+    PIZZA_SALES  
+**GROUP BY**   
+    pizza_size  
+**ORDER BY**   
+    AVERAGE **DESC**;  
+
+
+# Q.6 Get the total revenue for each combination of pizza size and pizza category ?
+
+
+**SELECT**  
+    pizza_size,   
+    pizza_category,  
+    sum(total_price) **AS** revenue  
+**FROM** PIZZA_SALES  
+**GROUP BY**   
+		pizza_size, pizza_category  
+**ORDER BY** revenue **DESC** ; 
+
+
+# Q.7 Identify the pizza that had the highest number of orders in the last month ?
+
+
+**SELECT**   
+date_format(str_to_date(order_date , ' %y-%m-%d'), '%Y-%m') **AS**  MONTH_number,  
+date_format(str_to_date(order_date , ' %y-%m-%d'), '%Y-%M') **AS** MONTH_NAME,  
+pizza_name_id,  
+count(pizza_id) **AS** TOTAL_ORDERS  
+**FROM**  
+	PIZZA_SALES  
+**GROUP BY** MONTH_NAME ,MONTH_number , pizza_name_id   
+**ORDER BY**   
+        MONTH_number **DESC** , TOTAL_ORDERS **DESC**  
+        **LIMIT** 1 ;  
+
+
+# Q.8 Determine the correlation between order time and total revenue ?
+
+
+**SELECT**  
+    order_time,  
+    SUM(total_price) **AS** revenue  
+**FROM**   
+    PIZZA_SALES  
+**GROUP BY**   
+    order_time  
+**ORDER BY**   
+    order_time;  
+
+
+
+# Q.9 Determine the most popular pizza size for each day of the week ?
+
+
+**WITH** PIZZA_SALES_REVENUE **AS** (  
     **SELECT**   
         pizza_size,  
         DATE_FORMAT(STR_TO_DATE(order_date, '%y-%m-%d'), '%W') **AS** week_day,  
         DATE_FORMAT(STR_TO_DATE(order_date, '%y-%m-%d'), '%w') **AS** week_number,  
-        SUM(total_price) AS total_revenue  
+        SUM(total_price) **AS** total_revenue  
     **FROM**  
         PIZZA_SALES     
     **GROUP BY**    
         pizza_size, week_day, week_number  
 ),  
-sales_rank AS (  
+sales_rank **AS** (  
     **SELECT**   
         pizza_size,  
         week_day,  
@@ -115,25 +156,38 @@ sales_rank AS (
     week_number **ASC**, week_day **ASC**; 
 
 
-
-**Q.6 Calculate the percentage contribution of each pizza category to the total revenue.**
-
-
-select
-	  pizza_category,
-      (total_value / total_revenue ) *100 as percentile_revenue
-      from
-		( select
-          pizza_category,
-          sum(total_price) as total_value ,
-          (select sum(total_price) from pizza_sales ) as total_revenue
-FROM PIZZA_SALES
-group by pizza_category) as total_category
-
-order by 
-percentile_revenue  desc ;
+    
 
 
-Q.7  
+# Q.10 Calculate the cumulative revenue for each month ?
 
 
+**WITH**   
+total_sales_revenue **AS**  
+( **SELECT**   
+	 date_format(str_to_date(order_date , '%Y-%m-%d'), '%m') **AS** month_number ,  
+     date_format(str_to_date(order_date , '%Y-%m-%d') ,'%M') **AS** month_1,  
+     sum(total_price) **AS** total_revenue  
+    **FROM** PIZZA_SALES  
+     **GROUP BY** month_number , month_1 ),  
+sales_rank **AS**  
+		( **SELECT**     
+				month_number,    
+				month_1,    
+                total_revenue,    
+                round((total_revenue - **LAG**(total_revenue) **over** ( **order by** month_number))/**LAG**(total_revenue) **OVER** (**ORDER BY** month_number) *100,2) **AS**  
+ cumulative_revenue        
+			  	**FROM**     
+                total_sales_revenue      
+                )  
+  	**SELECT**    
+		  	month_number,          
+		    	month_1 ,     
+			total_revenue ,    
+            cumulative_revenue    
+  	**FROM**   
+  		sales_rank    
+  	**GROUP BY**       
+			  month_number , month_1   
+	**ORDER BY**       
+			month_number  **ASC** ;
