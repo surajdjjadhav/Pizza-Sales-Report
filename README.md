@@ -1,12 +1,12 @@
 /* Questions & Answers */
 
-Q.1 Find the day with the highest total revenue and the corresponding revenue amount?
+**Q.1 Find the day with the highest total revenue and the corresponding revenue amount?**
 
 SELECT 
     DATE_FORMAT(STR_TO_DATE(order_date, '%Y-%m-%d'),
             '%W') AS week_day,
     SUM(total_price) AS total_revenue
-FROM
+FROM 
     PIZZA_SALES
 GROUP BY week_day
 ORDER BY total_revenue DESC
@@ -15,7 +15,7 @@ LIMIT 1;
 
 
 
-Q.2 Calculate the cumulative revenue for each month.
+**Q.2 Calculate the cumulative revenue for each month.**
 
 with 
 total_sales_revenue as
@@ -50,7 +50,7 @@ sales_rank as
 
 
 
-Q3. Identify the top 3 most expensive pizzas (by unit price) and their total sales (quantity).
+**Q3. Identify the top 3 most expensive pizzas (by unit price) and their total sales (quantity).**
   
    SELECT 
     pizza_name_id, unit_price, SUM(quantity) AS total_sales
@@ -62,8 +62,7 @@ LIMIT 3;
 
 
 
-Q4. Get the average order value (total_price) for each pizza category.
-
+**Q4. Get the average order value (total_price) for each pizza category.**
 SELECT 
     pizza_category,
     (total_reveue / COUNT(pizza_id)) AS average_revenue
@@ -79,7 +78,7 @@ ORDER BY average_revenue DESC
 
 
 
-Q.5 Determine the most popular pizza size for each day of the week.
+**Q.5 Determine the most popular pizza size for each day of the week.**
 
 WITH PIZZA_SALES_REVENUE AS (
     SELECT 
@@ -116,7 +115,7 @@ ORDER BY
 
 
 
-Q.6 Calculate the percentage contribution of each pizza category to the total revenue.
+**Q.6 Calculate the percentage contribution of each pizza category to the total revenue.**
 
 
 select
